@@ -1,0 +1,10 @@
+# Dataset original
+/data/data-raw/*.txt
+
+# Entorno virtual
+.venv/
+__pycache__/
+*.pyc
+
+# Archivos temporales
+.ipynb_checkpoints/
