@@ -1,5 +1,8 @@
 # Dataset original
 /data/data-raw/*.txt
+#Dataset generados
+/data/data-processed/*.csv
+
 
 # Entorno virtual
 .venv/
