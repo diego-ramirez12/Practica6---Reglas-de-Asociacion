@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import polars as pl
 
@@ -59,7 +58,6 @@ def analizar_faltantes(df):
 
 # 3. Construccion de la marca de tiempo
 def preparar_fechas(df):
-    # Unir Date y Time en una columna de tipo Datetime
     df = df.with_columns(
         pl.concat_str(
             [pl.col("Date"), pl.col("Time")],
@@ -81,14 +79,11 @@ def preparar_fechas(df):
 
 # 4. Verificacion de registros incompletos
 def verificar_faltantes(df):
-    # Filas donde faltan todas las mediciones numericas
     todas = df.filter(
         pl.all_horizontal(
             pl.col(COLUMNAS_NUMERICAS).is_null()
         )
     ).height
-
-    # Filas donde falta al menos una medicion
     alguna = df.filter(
         pl.any_horizontal(
             pl.col(COLUMNAS_NUMERICAS).is_null()
@@ -104,9 +99,8 @@ def eliminar_faltantes(df):
     filas_antes = df.height
 
     # Eliminar filas con mediciones numericas faltantes
-    # No se modifica el archivo TXT original
+    # NO SE MODIFICA el archivo TXT ORIGINAL
     df_limpio = df.drop_nulls(subset=COLUMNAS_NUMERICAS)
-
     filas_despues = df_limpio.height
 
     print("\nRegistros eliminados:", filas_antes - filas_despues)
@@ -129,7 +123,6 @@ def analizar_cobertura_horaria(df):
         )
         .sort("hora")
     )
-
     print("\nDistribucion de mediciones por hora:")
 
     print(
@@ -141,7 +134,6 @@ def analizar_cobertura_horaria(df):
     # Identificar horas con menos de 60 mediciones
     print("\nHoras con menos de 60 mediciones:")
     print(cobertura.filter(pl.col("mediciones") < 60).height)
-
     print("\nHoras completas:")
     print(cobertura.filter(pl.col("mediciones") == 60).height)
 
@@ -205,11 +197,9 @@ def generar_items(df_horario):
             pl.when(pl.col("Cocina"))
               .then(pl.lit("Cocina"))
               .otherwise(None),
-
             pl.when(pl.col("Lavanderia"))
               .then(pl.lit("Lavandería"))
               .otherwise(None),
-
             pl.when(pl.col("Climatizacion"))
               .then(pl.lit("Climatización"))
               .otherwise(None)
@@ -244,7 +234,7 @@ def generar_items(df_horario):
 
 # 9. Generacion de items temporales
 def generar_items_temporales(df_horario):
-    # Polars utiliza 1=Lunes y 7=Domingo
+    # 1=Lunes y 7=Domingo
     dia = pl.col("timestamp").dt.weekday()
 
     # Obtener la hora del dia (0 a 23)
@@ -294,10 +284,8 @@ def guardar_dataset(df_horario):
         RUTA_PROYECTO /
         "data/data-processed/input_reglas_asociacion.csv"
     )
-
     # Crear la carpeta de salida si no existe
     ruta_salida.parent.mkdir(parents=True, exist_ok=True)
-
     # Convertir la lista de items a texto para guardar en CSV
     # Las columnas booleanas se conservan para Apriori y FP-Growth
     df_salida = df_horario.with_columns(
@@ -308,7 +296,6 @@ def guardar_dataset(df_horario):
 
     # Guardar el archivo CSV
     df_salida.write_csv(ruta_salida)
-
     print("\nDataset consolidado guardado en:")
     print(ruta_salida)
 
@@ -330,19 +317,15 @@ if __name__ == "__main__":
     df = cargar_datos()
     analizar_faltantes(df)
     df = preparar_fechas(df)
-
     # Verificacion y limpieza
     verificar_faltantes(df)
     df = eliminar_faltantes(df)
     verificar_faltantes(df)
-
     # Analisis y agrupacion horaria
     cobertura = analizar_cobertura_horaria(df)
     df_horario = agrupar_por_hora(df)
-
     # Generacion de items
     df_horario = generar_items(df_horario)
     df_horario = generar_items_temporales(df_horario)
-
     # Exportacion del dataset procesado
     df_final = guardar_dataset(df_horario)
