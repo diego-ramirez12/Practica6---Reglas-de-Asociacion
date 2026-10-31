@@ -1,3 +1,6 @@
+<div style="text-align: left;">
+  <img width="200" src="https://www.fciencias.unam.mx/sites/default/files/logoFC_2.png" alt="Logo FC">
+</div>
 # Práctica 6 — Reglas de Asociación
 
 **Curso:** Almacenes y Minería de Datos  
@@ -77,6 +80,14 @@ python src/preprocessing/transacciones.py
 ```
 
 Esto genera el archivo `input_reglas_asociacion.csv` dentro de `data/data-processed/`.
+
+Ejecutar Apriori y FP-Growth:
+
+```bash
+python src/mining/algoritmos.py
+```
+
+Esto genera los archivos e imagen `comparacion_algoritmos.csv`,  `input_reglas_asociacion.csv` y `itemsets_frecuentes.csv`, `comparacion_algoritmos` dentro de `data/data-processed/` y `figures/comparacion_algoritmos.png` repsectivmante.
 
 ---
 
@@ -200,3 +211,20 @@ El dataset final contiene **34,085 transacciones horarias**, listas para la sigu
 
 ---
 
+### Comparación de Apriori y FP-Growth
+
+Se analizaron 34,085 transacciones horarias. Cada canasta contiene las actividades activas registradas en `Habitaciones_Activas`, un ítem `Día=...` y un ítem `Franja=...`. El umbral de actividad es el definido en el preprocesamiento (submedición horaria mayor que cero).
+
+Los conteos se midieron para min_support = 0.10, 0.05, 0.02, 0.01 y 0.005. En todos los casos los dos algoritmos devolvieron exactamente los mismos itemsets y conteos de soporte.
+
+| Soporte mínimo | Itemsets por algoritmo | Apriori (s) | FP-Growth (s) |
+|---:|---:|---:|---:|
+| 0.100 | 41 | 0.2441 | 0.1580 |
+| 0.050 | 56 | 0.2514 | 0.1527 |
+| 0.020 | 150 | 0.3795 | 0.1282 |
+| 0.010 | 238 | 0.4153 | 0.1051 |
+| 0.005 | 280 | 0.4465 | 0.1071 |
+
+Al bajar el soporte de 0.100 a 0.005, el número de itemsets pasó de 41 a 280. Un umbral bajo permite encontrar patrones poco comunes, pero aumenta el volumen de resultados y el riesgo de incluir coocurrencias casuales. Un umbral alto reduce el costo y deja solo patrones comunes, aunque puede omitir asociaciones raras.
+
+En esta ejecución, Apriori fue más rápido en 0 de 5 umbrales y FP-Growth en 5. Los tiempos son una medición puntual del equipo y pueden variar entre ejecuciones; FP-Growth evita la generación de candidatos, mientras que Apriori es más directo para este conjunto de ítems relativamente acotado.
