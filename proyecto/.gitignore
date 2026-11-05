@@ -3,6 +3,8 @@
 #Dataset generados
 /data/data-processed/*.csv
 
+# Permitir el archivo que conserva la carpeta
+!/proyecto/data/data-raw/.gitkeep
 
 # Entorno virtual
 .venv/
