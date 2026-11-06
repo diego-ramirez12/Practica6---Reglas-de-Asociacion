@@ -1,32 +1,43 @@
+from src.preprocessing import transacciones
+from src.mining.algoritmos import ejecutar_comparacion
+from src.association import reglas, analisis_reglas
+from src.visualization.graficas import generar_graficas
 
-from pathlib import Path
-import runpy
 
+def procesar_datos():
+    #Preparamos los datos originales para obtener las transacciones por hora
+    datos = transacciones.cargar_datos()
+    transacciones.analizar_faltantes(datos)
+    datos = transacciones.preparar_fechas(datos)
+    transacciones.verificar_faltantes(datos)
+    datos = transacciones.eliminar_faltantes(datos)
+    transacciones.analizar_cobertura_horaria(datos)
 
-RUTA_PROYECTO = Path(__file__).resolve().parent
+    #Agrupamos los registros y generamos los items
+    datos = transacciones.agrupar_por_hora(datos)
+    datos = transacciones.generar_items(datos)
+    datos = transacciones.generar_items_temporales(datos)
+    transacciones.guardar_dataset(datos)
 
-def ejecutar_script(ruta: str) -> None:
-    archivo = RUTA_PROYECTO / ruta
-    if not archivo.is_file():
-        raise FileNotFoundError(f"No se encontró el archivo: {archivo}")
-    print(f"\n{'=' * 60}")
-    print(f"Ejecutando: {ruta}")
-    print(f"{'=' * 60}\n")
-
-    runpy.run_path(str(archivo), run_name="__main__")
 
 def main():
-    scripts = [
-        "src/preprocessing/transacciones.py",
-        "src/mining/algoritmos.py",
-        "src/association/reglas.py",
-        "src/association/analisis_reglas.py"
-    ]
+    print("\n1. Preparando las transacciones")
+    procesar_datos()
 
-    for script in scripts:
-        ejecutar_script(script)
+    print("\n2. Ejecutando Apriori y FP-Growth")
+    ejecutar_comparacion()
 
-    print("\nProceso completado correctamente.")
+    print("\n3. Generando las reglas de asociacion")
+    reglas.main()
+
+    print("\n4. Analizando las reglas")
+    analisis_reglas.main()
+
+    print("\n5. Generando las graficas")
+    generar_graficas()
+
+    print("\nTerminado correctamente")
+
 
 if __name__ == "__main__":
     main()

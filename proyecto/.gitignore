@@ -1,10 +1,13 @@
 # Dataset original
 /data/data-raw/*.txt
-#Dataset generados
+
+# Archivos CSV generados
 /data/data-processed/*.csv
 
 # Permitir el archivo que conserva la carpeta
 !/proyecto/data/data-raw/.gitkeep
+# El archivo de reglas si se entrega
+!/data/data-processed/reglas_asociacion.csv
 
 # Entorno virtual
 .venv/

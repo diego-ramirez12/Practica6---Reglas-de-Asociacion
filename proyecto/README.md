@@ -37,60 +37,91 @@ El archivo original contiene **2,075,259 registros y 9 columnas**.
 
 ```text
 proyecto/
+│
 ├── data/
 │   ├── data-raw/
-│   │   └── household_power_consumption.txt
+│   │   └── .gitkeep
+│   │
 │   └── data-processed/
-│       └── input_reglas_asociacion.csv
+│       └── .gitkeep
+│
+├── figures/
 │
 ├── src/
 │   ├── preprocessing/
 │   │   └── transacciones.py
+│   │
 │   ├── mining/
+│   │   └── algoritmos.py
+│   │
 │   ├── association/
+│   │   ├── reglas.py
+│   │   └── analisis_reglas.py
+│   │
 │   └── visualization/
+│       ├── __init__.py
+│       └── graficas.py
 │
-├── figures/
-├── presentacion/
 ├── main.py
 ├── requirements.txt
+├── .gitignore
 └── README.md
 ```
 
-El dataset original no se incluye en GitHub debido a su tamaño. Debe descargarse desde UCI y colocarse en `data/data-raw/`.
+El dataset original no se incluye en el repositorio debido a
+su tamaño. Se debe descargar desde UCI Machine Learning
+Repository y colocar en `data/data-raw/`
 
 ## 4. Instalación y ejecución
 
-Desde la carpeta `proyecto/`, crear y activar un entorno virtual:
+Para ejecutar el proyecto es necesario tener Python instalado
+y descargar el dataset original desde UCI Machine Learning
+Repository.
+
+El archivo `household_power_consumption.txt` debe colocarse
+en `data/data-raw/`.
+
+### 4.1. Crear el entorno virtual
+
+Desde la carpeta `proyecto/`, ejecutar:
 
 ```bash
 python3 -m venv .venv
+```
+
+Activar el entorno virtual:
+
+```bash
 source .venv/bin/activate
 ```
 
-Instalar las dependencias:
+### 4.2. Instalar las dependencias
+
+Instalar las bibliotecas necesarias:
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-Ejecutar el preprocesamiento:
+### 4.3. Ejecutar la práctica
+
+Para ejecutar todas las etapas del programa:
 
 ```bash
-python src/preprocessing/transacciones.py
+python main.py
 ```
 
-Esto genera el archivo `input_reglas_asociacion.csv` dentro de `data/data-processed/`.
+El programa realiza las siguientes actividades:
 
-Ejecutar Apriori y FP-Growth:
+1. Carga y limpieza del dataset original.
+2. Construcción de las transacciones horarias.
+3. Ejecución de Apriori y FP-Growth.
+4. Generación de las reglas de asociación.
+5. Analisis de las reglas encontradas.
+6. Generación de las graficas.
 
-```bash
-python src/mining/algoritmos.py
-```
-
-Esto genera los archivos e imagen `comparacion_algoritmos.csv`,  `input_reglas_asociacion.csv` y `itemsets_frecuentes.csv`, `comparacion_algoritmos` dentro de `data/data-processed/` y `figures/comparacion_algoritmos.png` repsectivmante.
-
----
+Los resultados se guardan en las carpetas
+`data/data-processed/` y `figures/`
 
 ## 5. Preprocesamiento y construcción de transacciones 
 
@@ -229,3 +260,66 @@ Los conteos se midieron para min_support = 0.10, 0.05, 0.02, 0.01 y 0.005. En to
 Al bajar el soporte de 0.100 a 0.005, el número de itemsets pasó de 41 a 280. Un umbral bajo permite encontrar patrones poco comunes, pero aumenta el volumen de resultados y el riesgo de incluir coocurrencias casuales. Un umbral alto reduce el costo y deja solo patrones comunes, aunque puede omitir asociaciones raras.
 
 En esta ejecución, Apriori fue más rápido en 0 de 5 umbrales y FP-Growth en 5. Los tiempos son una medición puntual del equipo y pueden variar entre ejecuciones; FP-Growth evita la generación de candidatos, mientras que Apriori es más directo para este conjunto de ítems relativamente acotado.
+
+
+---
+
+
+---
+
+## 6. Integración y visualización de resultados
+
+El archivo `main.py` permite ejecutar todas las etapas de
+la practica, utilizando las funciones desarrolladas en los
+diferentes módulos del proyecto
+
+### 6.1. Visualizaciones
+
+Se utilizo Matplotlib para generar las gráficas y Pandas
+para leer los resultados guardados en archivos CSV.
+
+Las imágenes generadas se guardan en la carpeta `figures/`
+
+**Gráficas de Apriori y FP-Growth:**
+
+- `comparacion_algoritmos.png`: comparación de los algoritmos.
+- `itemsets_por_soporte.png`: cantidad de itemsets frecuentes
+  según el soporte minimo.
+- `tiempos_algoritmos.png`: comparación de los tiempos de
+  ejecución de ambos algoritmos.
+
+**Gráficas de las reglas de asociación:**
+
+- `reglas_asociacion.png`: relación entre soporte, confianza y lift.
+- `top_reglas_lift.png`: diez reglas con mayor lift.
+- `comparacion_metricas_reglas.png`: relación entre confianza y lift.
+- `distribucion_metricas.png`: distribución de soporte, confianza
+  y lift entre las reglas encontradas.
+
+### 6.2. Archivos generados
+
+Los resultados se guardan como archivos CSV en
+`data/data-processed/`
+
+Los principales archivos son:
+
+- `input_reglas_asociacion.csv`
+- `comparacion_algoritmos.csv`
+- `itemsets_frecuentes.csv`
+- `reglas_asociacion.csv`
+
+Tambien se generan archivos con las reglas más relevantes
+según su soporte, confianza y lift
+
+### 6.3. Integración del programa
+
+El programa sigue el siguiente orden:
+
+1. Preprocesamiento de los datos.
+2. Ejecución de Apriori y FP-Growth.
+3. Generación de reglas de asociación.
+4. Análisis de las reglas.
+5. Generación de las visualizaciones.
+
+De esta forma, todo el procedimiento se puede ejecutar
+desde un solo archivo mediante `python main.py`
